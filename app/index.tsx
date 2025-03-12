@@ -9,33 +9,24 @@ import Animated, {
 
 export default function Index() {
 
-  const width = useSharedValue(100);
-
-  const [boolean, setBoolean] = useState(false)
-
-  const updateWidthWorklet = (maxWidth: number) => {
+  const returningValue = () => {
     'worklet';
-    width.value = withSpring(Math.random() * maxWidth);
-    runOnJS(setBoolean)(!boolean) //Fonctionne
-  };
+    return "World !"
+  }
 
-  const updateWidthNotWorklet = (maxWidth: number) => {
-    width.value = withSpring(Math.random() * maxWidth);
-    runOnJS(setBoolean)(!boolean) //Fonctionne
-  };
-
-  useEffect(() => {
-    runOnUI(updateWidthNotWorklet)(300);
-  }, [])
+  const someWorklet = () => {
+    'worklet';
+    console.log("Hello", returningValue());
+  }
 
   return (
     <View
       style={styles.container}
     >
-      <Animated.View style={{ ...styles.square, width }} />
+      <Animated.View style={styles.square} />
       <Button
         title="Press me"
-        onPress={() => runOnUI(updateWidthWorklet)(300)}
+        onPress={() => runOnUI(someWorklet)()}
       />
     </View>
   );
