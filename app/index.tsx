@@ -1,47 +1,38 @@
 import { useState } from "react";
 import { Button, StyleSheet, View } from "react-native";
 import Animated, {
-  Easing,
-  Keyframe,
-  PinwheelIn,
+  FadeIn,
+  FadeOut,
+  LinearTransition
 } from "react-native-reanimated";
 
 export default function Index() {
 
-  const [isVisible, setIsVisible] = useState(false)
-
-  const keyframeExiting = new Keyframe({
-    0: {
-      transform: [{ rotate: '0deg' }, { scale: 1 }],
-      opacity: 1,
-    },
-    45: {
-      transform: [{ rotate: '100deg' }, { scale: 1.2 }],
-      opacity: 1,
-      easing: Easing.exp,
-    },
-    100: {
-      transform: [{ rotate: '45deg' }, { scale: 0.1 }],
-      opacity: 0,
-    },
-  })
-    .delay(500)
-    .duration(2000)
+  const [expanded, setExpanded] = useState(false)
+  const [visible, setVisible] = useState(false)
 
   return (
     <View
       style={styles.container}
     >
-      {isVisible &&
+      {visible &&
         <Animated.View
-          entering={PinwheelIn.duration(1000)}
-          exiting={keyframeExiting}
-          style={styles.square}
+          layout={LinearTransition.springify()}
+          exiting={FadeOut.duration(500)}
+          entering={FadeIn.duration(500)}
+          style={[
+            styles.square,
+            { height: expanded ? 200 : 100 }
+          ]}
         />
       }
       <Button
         title="Press me"
-        onPress={() => setIsVisible(!isVisible)}
+        onPress={() => setExpanded(!expanded)}
+      />
+      <Button
+        title="Change Visilbility"
+        onPress={() => setVisible(!visible)}
       />
     </View>
   );
