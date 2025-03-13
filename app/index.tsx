@@ -1,10 +1,11 @@
 import { Button, StyleSheet, View } from "react-native";
 import Animated, {
-  Easing,
+  cancelAnimation,
   runOnUI,
   useAnimatedStyle,
   useSharedValue,
-  withTiming,
+  withRepeat,
+  withSpring,
 } from "react-native-reanimated";
 
 export default function Index() {
@@ -19,16 +20,18 @@ export default function Index() {
   });
 
   const changeWidth = () => {
-    width.value = withTiming(
-      Math.random() * 50,
-      {
-        duration: 500,
-        easing: Easing.inOut(Easing.ease),
-      },
-      (isFinished) => {
-        console.log("is animation properly terminate ?", isFinished);
+    width.value = withRepeat(
+      withSpring(Math.random() * 300),
+      -1,
+      true,
+      (isFinisehd) => {
+        console.log("Animation terminée", isFinisehd);
       }
     )
+  }
+
+  const stopAnimation = () => {
+    cancelAnimation(width);
   }
 
   return (
@@ -39,6 +42,10 @@ export default function Index() {
       <Button
         title="Press me"
         onPress={() => runOnUI(changeWidth)()}
+      />
+      <Button
+        title="Stop Animation"
+        onPress={stopAnimation}
       />
     </View>
   );
