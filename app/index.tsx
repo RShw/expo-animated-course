@@ -1,32 +1,44 @@
-import { useEffect, useState } from "react";
 import { Button, StyleSheet, View } from "react-native";
 import Animated, {
-  runOnJS,
+  Easing,
   runOnUI,
+  useAnimatedStyle,
   useSharedValue,
-  withSpring
+  withTiming,
 } from "react-native-reanimated";
 
 export default function Index() {
 
-  const returningValue = () => {
-    'worklet';
-    return "World !"
-  }
+  //width est une shared value
+  const width = useSharedValue(100);
 
-  const someWorklet = () => {
-    'worklet';
-    console.log("Hello", returningValue());
+  const animatedStyles = useAnimatedStyle(() => {
+    return {
+      width: width.value + 100,
+    };
+  });
+
+  const changeWidth = () => {
+    width.value = withTiming(
+      Math.random() * 50,
+      {
+        duration: 500,
+        easing: Easing.inOut(Easing.ease),
+      },
+      (isFinished) => {
+        console.log("is animation properly terminate ?", isFinished);
+      }
+    )
   }
 
   return (
     <View
       style={styles.container}
     >
-      <Animated.View style={styles.square} />
+      <Animated.View style={[styles.square, animatedStyles]} />
       <Button
         title="Press me"
-        onPress={() => runOnUI(someWorklet)()}
+        onPress={() => runOnUI(changeWidth)()}
       />
     </View>
   );
