@@ -1,55 +1,56 @@
+import { useState } from "react";
 import { Button, StyleSheet, View } from "react-native";
 import Animated, {
-  cancelAnimation,
-  runOnUI,
-  useAnimatedStyle,
-  useSharedValue,
-  withRepeat,
-  withSpring,
+  Easing,
+  Keyframe,
+  PinwheelIn,
 } from "react-native-reanimated";
 
 export default function Index() {
 
-  //width est une shared value
-  const width = useSharedValue(100);
+  const [isVisible, setIsVisible] = useState(false)
 
-  const animatedStyles = useAnimatedStyle(() => {
-    return {
-      width: width.value + 100,
-    };
-  });
-
-  const changeWidth = () => {
-    width.value = withRepeat(
-      withSpring(Math.random() * 300),
-      -1,
-      true,
-      (isFinisehd) => {
-        console.log("Animation terminée", isFinisehd);
-      }
-    )
-  }
-
-  const stopAnimation = () => {
-    cancelAnimation(width);
-  }
+  const keyframeExiting = new Keyframe({
+    0: {
+      transform: [{ rotate: '0deg' }, { scale: 1 }],
+      opacity: 1,
+    },
+    45: {
+      transform: [{ rotate: '100deg' }, { scale: 1.2 }],
+      opacity: 1,
+      easing: Easing.exp,
+    },
+    100: {
+      transform: [{ rotate: '45deg' }, { scale: 0.1 }],
+      opacity: 0,
+    },
+  })
+    .delay(500)
+    .duration(2000)
 
   return (
     <View
       style={styles.container}
     >
-      <Animated.View style={[styles.square, animatedStyles]} />
+      {isVisible &&
+        <Animated.View
+          entering={PinwheelIn.duration(1000)}
+          exiting={keyframeExiting}
+          style={styles.square}
+        />
+      }
       <Button
         title="Press me"
-        onPress={() => runOnUI(changeWidth)()}
-      />
-      <Button
-        title="Stop Animation"
-        onPress={stopAnimation}
+        onPress={() => setIsVisible(!isVisible)}
       />
     </View>
   );
 }
+
+
+
+
+
 
 const styles = StyleSheet.create({
   container: {
@@ -59,7 +60,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   square: {
-    // width: 100,
+    width: 100,
     height: 100,
     backgroundColor: "lightblue",
     borderRadius: 12,
