@@ -1,31 +1,52 @@
-import { useState } from "react";
-import { Button, StyleSheet, View } from "react-native";
+import { useEffect } from "react";
+import { StyleSheet, View } from "react-native";
 import Animated, {
-  FadeIn,
-  FadeOut,
-  LayoutAnimationConfig
+  Extrapolation,
+  interpolate,
+  useAnimatedStyle,
+  useSharedValue,
+  withRepeat,
+  withSequence,
+  withTiming,
 } from "react-native-reanimated";
 
 export default function Index() {
 
-  const [visible, setVisible] = useState(true)
+  const scale = useSharedValue(0.5);
+
+  const animatedScaleStyle = useAnimatedStyle(() => {
+    return {
+      transform: [
+        {
+          scale: interpolate(
+            scale.value,
+            [0, 1],
+            [0.5, 1.5],
+            Extrapolation.CLAMP
+          )
+        },
+      ],
+    };
+  });
+
+  useEffect(() => {
+    scale.value = withRepeat(
+      withSequence(
+        withTiming(1, { duration: 1500 }),
+        withTiming(0, { duration: 1500 }),
+      ),
+      -1,
+      true
+    );
+  }, [])
+
 
   return (
     <View
       style={styles.container}
     >
-      <LayoutAnimationConfig skipEntering skipExiting>
-        {visible &&
-          <Animated.View
-            style={styles.square}
-            exiting={FadeOut.duration(500)}
-            entering={FadeIn.duration(500)}
-          />
-        }
-      </LayoutAnimationConfig>
-      <Button
-        title="Change Visilbility"
-        onPress={() => setVisible(!visible)}
+      <Animated.View
+        style={[styles.square, animatedScaleStyle]}
       />
     </View>
   );
